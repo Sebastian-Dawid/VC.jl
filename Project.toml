@@ -1,7 +1,7 @@
 name = "VC"
 uuid = "c4486bb8-a42d-46a1-aa94-c7ce885e71cb"
-version = "0.1.0"
 authors = ["Sebastian Emanuel Dawid <sdawid@techfak.uni-bielefeld.de>"]
+version = "0.1.0"
 
 [deps]
 ColorTypes = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
@@ -13,6 +13,6 @@ Preferences = "21216c6a-2e73-6563-6e65-726566657250"
 [compat]
 ColorTypes = "0.11.5"
 FileIO = "1.16.6"
-ImageView = "0.12.5"
+ImageView = "0.12.6"
 KernelAbstractions = "0.9.33"
 Preferences = "1.4.3"

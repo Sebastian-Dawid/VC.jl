@@ -104,7 +104,6 @@ Float64
 """
 function tensor(::Type{T}, img::AbstractArray{RGB{U}, 2}) where {T <: AbstractFloat, U}
     sz = size(img)
-    rand()
     R = [ T(img[i, j].r) for _=1:1, i=1:sz[1], j=1:sz[2] ]
     G = [ T(img[i, j].g) for _=1:1, i=1:sz[1], j=1:sz[2] ]
     B = [ T(img[i, j].b) for _=1:1, i=1:sz[1], j=1:sz[2] ]
@@ -142,12 +141,12 @@ RGB{Float64}
 """
 function image(tensor::AbstractArray{T, 3})::AbstractArray{RGB{T}, 2} where {T <: AbstractFloat}
     sz = size(tensor)
-    return [ RGB(tensor[1, i, j], tensor[2, i, j], tensor[3, i, j]) for j=1:sz[3], i=1:sz[2] ]
+    return [ RGB(tensor[1, i, j], tensor[2, i, j], tensor[3, i, j]) for i=1:sz[2],j=1:sz[3] ]
 end
 
 
 """
-    imshow(img::AbstractArray{RGB{T}, 2}; show=true, save_to=Nothing)::Nothing where {T}
+    imshow(img::AbstractArray{RGB{T}, 2}; show=true, save_to=Nothing) where {T}
 
 Shows and/or saves the given image. Waits until the image is closed.
 
@@ -184,7 +183,7 @@ See also: [`tensor`](@ref), [`image`](@ref), [`imshow`](@ref)
 - `path`: Path to the image to load.
 """
 function imread(::Type{T}, path::String)::AbstractArray{T, 3} where {T <: AbstractFloat}
-    img = rotr90(load(path))
+    img = load(path)
     return tensor(T, img)
 end
 
