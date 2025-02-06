@@ -65,9 +65,9 @@ Returns a vector of elements of type `T` from `start` to `finish` in `steps` ste
 
 # Arguments
 - `T`: Type of the elements in the resulting vector. Defaults to [`Float32`](@ref).
-- `start`:
-- `finish`:
-- `steps`:
+- `start`: The first element in the resulting vector.
+- `finish`: The last element in the resulting vector.
+- `steps`: The number of steps to split the range into.
 
 # Example
 ```jldoctest
