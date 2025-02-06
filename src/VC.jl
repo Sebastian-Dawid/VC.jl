@@ -17,6 +17,15 @@ end
 
 to_gpu = !(GPU_BACKEND == "NONE" || GPU_BACKEND == "CPU")
 
+
+"""
+    set_backend(new_backend::String)
+
+Sets the GPU backend to the given backend. Requires a restart of Julia to take effect.
+
+# Arguments
+- `new_backend`: The name of the new backend.
+"""
 function set_backend(new_backend::String)
     if !(new_backend in ("CUDA", "AMDGPU", "oneAPI", "CPU"))
         throw(ArgumentError("Invalid Backend: \"$new_backend\""))
@@ -25,6 +34,7 @@ function set_backend(new_backend::String)
     @set_preferences!("gpu_backend" => new_backend)
     @info "New backend set; restart your Julia session for this change to take effect!"
 end
+
 
 """
     gpu(arr::AbstractArray)::AbstractArray
@@ -50,6 +60,31 @@ end
 
 """
     linspace([T = Float32], start, finish, steps::Integer)::AbstractArray{T, 1} where {T <: AbstractFloat}
+
+Returns a vector of elements of type `T` from `start` to `finish` in `steps` steps.
+
+# Arguments
+- `T`: Type of the elements in the resulting vector. Defaults to [`Float32`](@ref).
+- `start`:
+- `finish`:
+- `steps`:
+
+# Example
+```jldoctest
+julia> linspace(0, 10, 11)
+11-element Vector{Float32}:
+  0.0
+  1.0
+  2.0
+  3.0
+  4.0
+  5.0
+  6.0
+  7.0
+  8.0
+  9.0
+ 10.0
+```
 """
 function linspace(::Type{T}, start, finish, steps::Integer)::AbstractArray{T, 1} where {T <: AbstractFloat}
     return Array{T}(start:((finish-start)/(steps-1)):finish)
@@ -57,16 +92,6 @@ end
 
 function linspace(start, finish, steps::Integer)::AbstractArray{Float32, 1}
     return linspace(Float32, start, finish, steps)
-end
-
-
-"""
-    meshgrid(XS::AbstractArray, YS::AbstractArray)::NTuple{2, AbstractArray}
-"""
-function meshgrid(XS::AbstractArray, YS::AbstractArray)::NTuple{2, AbstractArray}
-    X = [ i for i=YS, _=XS ]
-    Y = [ j for _=YS, j=XS ]
-    return X, Y
 end
 
 
@@ -191,6 +216,6 @@ function imread(path::String)::AbstractArray{Float32, 3}
     return imread(Float32, path)
 end
 
-export gpu, linspace, meshgrid, tensor, image, imshow, imread
+export gpu, linspace, tensor, image, imshow, imread
 
 end # module VC
