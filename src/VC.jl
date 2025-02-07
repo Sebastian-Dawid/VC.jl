@@ -216,6 +216,6 @@ function imread(path::String)::AbstractArray{Float32, 3}
     return imread(Float32, path)
 end
 
-export gpu, linspace, tensor, image, imshow, imread
+export gpu, linspace, tensor, image, imshow, imread, set_backend
 
 end # module VC
