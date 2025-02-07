@@ -4,15 +4,21 @@ authors = ["Sebastian Emanuel Dawid <sdawid@techfak.uni-bielefeld.de>"]
 version = "0.1.0"
 
 [deps]
+AMDGPU = "21141c5a-9bdb-4563-92ae-f87d6854732e"
+CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
 ColorTypes = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
 FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
 ImageView = "86fae568-95e7-573e-a6b2-d8a6b900c9ef"
 KernelAbstractions = "63c18a36-062a-441e-b654-da1e3ab1ce7c"
 Preferences = "21216c6a-2e73-6563-6e65-726566657250"
+oneAPI = "8f75cd03-7ff8-4ecb-9b8f-daf728133b1b"
 
 [compat]
+AMDGPU = "1.1.7"
+CUDA = "5.6.1"
 ColorTypes = "0.11.5"
 FileIO = "1.16.6"
 ImageView = "0.12.6"
 KernelAbstractions = "0.9.33"
 Preferences = "1.4.3"
+oneAPI = "2.0.1"
