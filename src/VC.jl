@@ -96,9 +96,9 @@ end
 
 
 """
-    tensor([T = Float32], img::AbstractArray{RGB, 2})
+    tensor([T = Float32], img::AbstractArray{RGB, 2})::AbstractArray{T, 3}
 
-Converts an image to a 3xHxW tensor. [`image`](@ref) is the inverse to this function.
+Converts an image to a CxHxW tensor. [`image`](@ref) is the inverse to this function.
 
 See also: [`image`](@ref), [`imshow`](@ref), [`imread`](@ref).
 
@@ -127,29 +127,24 @@ julia> typeof(t[1])
 Float64
 ```
 """
-function tensor(::Type{T}, img::AbstractArray{RGB{U}, 2}) where {T <: AbstractFloat, U}
-    sz = size(img)
-    R = [ T(img[i, j].r) for _=1:1, i=1:sz[1], j=1:sz[2] ]
-    G = [ T(img[i, j].g) for _=1:1, i=1:sz[1], j=1:sz[2] ]
-    B = [ T(img[i, j].b) for _=1:1, i=1:sz[1], j=1:sz[2] ]
-    return cat(R, G, B, dims=1)
+function tensor(::Type{T}, img::AbstractArray{U, 2})::AbstractArray{T, 3} where {T <: AbstractFloat, U <: Colorant}
+    return mapreduce(x -> reshape(x, (1, size(img)...)), vcat, [ Float32.(@eval($(Symbol("comp$(i)"))).(img)) for i in 1:length(img[1]) ])
 end
 
-# use Float32 as the default value for T
-function tensor(img::AbstractArray{RGB{U}, 2}) where {U}
+function tensor(img::AbstractArray{U, 2})::AbstractArray{Float32, 3} where {U <: Colorant}
     return tensor(Float32, img)
 end
 
 
 """
-    image(t::AbstractArray{T, 3})::AbstractArray{RGB{T}, 2} where {T <: AbstractFloat}
+    image(t::AbstractArray{T, 3})::AbstractArray{U, 2} where {T <: AbstractFloat, U <: Colorant}
 
-Converts a 3xHxW tensor to a displayable image. [`tensor`](@ref) is the inverse to this function.
+Converts a CxHxW tensor to a displayable image. [`tensor`](@ref) is the inverse to this function.
 
 See also: [`tensor`](@ref), [`imshow`](@ref), [`imread`](@ref).
 
 # Arguments
-- `t`: 3xHxW tensor containing the color data of an image
+- `t`: CxHxW tensor containing the color data of an image
 
 # Example
 ```jldoctest
@@ -164,14 +159,18 @@ julia> typeof(img[1])
 RGB{Float64}
 ```
 """
-function image(tensor::AbstractArray{T, 3})::AbstractArray{RGB{T}, 2} where {T <: AbstractFloat}
+function image(tensor::AbstractArray{T, 3})::AbstractArray{Colorant, 2} where {T <: AbstractFloat}
     sz = size(tensor)
-    return [ RGB(tensor[1, i, j], tensor[2, i, j], tensor[3, i, j]) for i=1:sz[2],j=1:sz[3] ]
+    if (sz[1] == 3)
+        return [ RGB(tensor[1, i, j], tensor[2, i, j], tensor[3, i, j]) for i=1:sz[2], j=1:sz[3] ]
+    else
+        return [ Gray(tensor[1, i, j]) for i=1:sz[2], j=1:sz[3] ]
+    end
 end
 
 
 """
-    imshow(img::AbstractArray{RGB{T}, 2}; show=true, save_to=Nothing) where {T}
+    imshow(img::AbstractArray{T, 2}; show=true, save_to=Nothing) where {T <: Colorant}
 
 Shows and/or saves the given image. Waits until the image is closed.
 
@@ -182,7 +181,7 @@ See also: [`imread`](@ref), [`image`](@ref), [`tensor`](@ref).
 - `show`: Determines wheter the image should be displayed.
 - `save_to`: Location to save the image to. Defaults to [`Nothing`](@ref) which will not save the image.
 """
-function imshow(img::AbstractArray{RGB{T}, 2}; show=true, save_to=Nothing) where {T}
+function imshow(img::AbstractArray{T, 2}; show=true, save_to=Nothing) where {T <: Colorant}
     if (save_to != Nothing)
         save(save_to, img)
     end
@@ -199,7 +198,7 @@ end
 """
     imread([T = Float32], path::String)::AbstractArray{T, 3} where {T <: AbstractFloat}
 
-Loads the given image as a 3xHxW tensor.
+Loads the given image as a CxHxW tensor.
 
 See also: [`tensor`](@ref), [`image`](@ref), [`imshow`](@ref)
 
