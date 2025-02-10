@@ -1,6 +1,7 @@
 module VC
 
-using Preferences, ColorTypes, FileIO
+using Reexport, Preferences
+@reexport using ColorTypes, FileIO
 import ImageView
 
 const GPU_BACKEND = @load_preference("gpu_backend", "NONE")
@@ -159,7 +160,7 @@ julia> typeof(img[1])
 RGB{Float64}
 ```
 """
-function image(tensor::AbstractArray{T, 3})::AbstractArray{Colorant, 2} where {T <: AbstractFloat}
+function image(tensor::AbstractArray{T, 3})::AbstractMatrix where {T <: AbstractFloat}
     sz = size(tensor)
     if (sz[1] == 3)
         return [ RGB(tensor[1, i, j], tensor[2, i, j], tensor[3, i, j]) for i=1:sz[2], j=1:sz[3] ]
