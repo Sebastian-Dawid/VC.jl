@@ -4,10 +4,10 @@ using Reexport
 @reexport using ColorTypes, FileIO, Zygote, Optimisers, LinearAlgebra
 import ImageView
 
+GPU_BACKEND::Union{Nothing,String} = nothing
+
 """
     gpu(arr::AbstractArray)::AbstractArray
-
-This function should not be called if no GPU extension is loaded!
 
 The available GPU backends are:
 - CUDA (Nvidia)
@@ -20,9 +20,11 @@ The extension will be loaded when the GPU backend is loaded. E.g.
 julia> using CUDA
 ```
 will load the CUDA extension.
+
+If no backend is loaded this function does nothing.
 """
 function gpu(arr::AbstractArray)::AbstractArray
-    return gpu(Float32, arr) # rely on extension to define the actual function
+    return (isnothing(GPU_BACKEND)) ? arr : gpu(Float32, arr)
 end
 
 
@@ -183,6 +185,6 @@ function imread(path::String)::AbstractArray{Float32, 3}
     return imread(Float32, path)
 end
 
-export gpu, linspace, tensor, image, imshow, imread
+export gpu, linspace, tensor, image, imshow, imread, GPU_BACKEND
 
 end # module VC

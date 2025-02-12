@@ -14,4 +14,8 @@ function VC.gpu(::Type{T}, arr::AbstractArray)::ROCArray{T} where {T}
     return ROCArray{T}(arr)
 end
 
+function __init__()
+    VC.GPU_BACKEND = "AMDGPU"
+end
+
 end

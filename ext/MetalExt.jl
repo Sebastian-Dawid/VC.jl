@@ -14,4 +14,8 @@ function VC.gpu(::Type{T}, arr::AbstractArray)::MtlArray{T} where {T}
     return MtlArray{T}(arr)
 end
 
+function __init__()
+    VC.GPU_BACKEND = "Metal"
+end
+
 end

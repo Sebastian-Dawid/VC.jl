@@ -14,4 +14,8 @@ function VC.gpu(::Type{T}, arr::AbstractArray)::CuArray{T} where {T}
     return CuArray{T}(arr)
 end
 
+function __init__()
+    VC.GPU_BACKEND = "CUDA"
+end
+
 end

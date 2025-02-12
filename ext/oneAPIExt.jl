@@ -14,4 +14,8 @@ function VC.gpu(::Type{T}, arr::AbstractArray)::oneArray{T} where {T}
     return oneArray{T}(arr)
 end
 
+function __init__()
+    VC.GPU_BACKEND = "oneAPI"
+end
+
 end
