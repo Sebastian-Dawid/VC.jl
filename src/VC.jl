@@ -1,61 +1,28 @@
 module VC
 
-using Reexport, Preferences
+using Reexport
 @reexport using ColorTypes, FileIO, Zygote, Optimisers, LinearAlgebra
 import ImageView
-
-const GPU_BACKEND = @load_preference("gpu_backend", "NONE")
-
-if (GPU_BACKEND == "CUDA")
-    using CUDA
-elseif (GPU_BACKEND == "AMDGPU")
-    using AMDGPU
-elseif (GPU_BACKEND == "oneAPI")
-    using oneAPI
-elseif (GPU_BACKEND == "NONE")
-    @warn "No Backend Selected. Using CPU as fallback."
-end
-
-to_gpu = !(GPU_BACKEND == "NONE" || GPU_BACKEND == "CPU")
-
-
-"""
-    set_backend(new_backend::String)
-
-Sets the GPU backend to the given backend. Requires a restart of Julia to take effect.
-
-# Arguments
-- `new_backend`: The name of the new backend.
-"""
-function set_backend(new_backend::String)
-    if !(new_backend in ("CUDA", "AMDGPU", "oneAPI", "CPU"))
-        throw(ArgumentError("Invalid Backend: \"$new_backend\""))
-    end
-
-    @set_preferences!("gpu_backend" => new_backend)
-    @info "New backend set; restart your Julia session for this change to take effect!"
-end
-
 
 """
     gpu(arr::AbstractArray)::AbstractArray
 
-Copies a given array to the GPU based on the selected backend. Has no effect if the "CPU"
-or no backend is selected.
+This function should not be called if no GPU extension is loaded!
 
-# Arguments
-- `arr`: The array to copy to the GPU.
+The available GPU backends are:
+- CUDA (Nvidia)
+- AMDGPU (AMD)
+- oneAPI (Intel)
+- Metal (Apple)
+
+The extension will be loaded when the GPU backend is loaded. E.g.
+```jldoctest
+julia> using CUDA
+```
+will load the CUDA extension.
 """
 function gpu(arr::AbstractArray)::AbstractArray
-    @static if (GPU_BACKEND == "CUDA")
-        return CuArray(arr)
-    elseif (GPU_BACKEND == "AMDGPU")
-        return ROCArray(arr)
-    elseif (GPU_BACKEND == "oneAPI")
-        return oneArray(arr)
-    else
-        return arr
-    end
+    return gpu(Float32, arr) # rely on extension to define the actual function
 end
 
 
@@ -216,6 +183,6 @@ function imread(path::String)::AbstractArray{Float32, 3}
     return imread(Float32, path)
 end
 
-export gpu, linspace, tensor, image, imshow, imread, set_backend
+export gpu, linspace, tensor, image, imshow, imread
 
 end # module VC
