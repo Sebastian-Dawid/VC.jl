@@ -1,7 +1,7 @@
 module VC
 
 using Reexport, Preferences
-@reexport using ColorTypes, FileIO
+@reexport using ColorTypes, FileIO, Zygote, Optimisers, LinearAlgebra
 import ImageView
 
 const GPU_BACKEND = @load_preference("gpu_backend", "NONE")
