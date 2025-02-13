@@ -4,66 +4,9 @@ using Reexport
 @reexport using ColorTypes, FileIO, Zygote, Optimisers, LinearAlgebra
 import ImageView
 
-GPU_BACKEND::Union{Nothing,String} = nothing
+module ImageTensorConversion
 
-"""
-    gpu(arr::AbstractArray)::AbstractArray
-
-The available GPU backends are:
-- CUDA (Nvidia)
-- AMDGPU (AMD)
-- oneAPI (Intel)
-- Metal (Apple)
-
-The extension will be loaded when the GPU backend is loaded. E.g.
-```jldoctest
-julia> using CUDA
-```
-will load the CUDA extension.
-
-If no backend is loaded this function does nothing.
-"""
-function gpu(arr::AbstractArray)::AbstractArray
-    return (isnothing(GPU_BACKEND)) ? arr : gpu(Float32, arr)
-end
-
-
-"""
-    linspace([T = Float32], start, finish, steps::Integer)::AbstractArray{T, 1} where {T <: AbstractFloat}
-
-Returns a vector of elements of type `T` from `start` to `finish` in `steps` steps.
-
-# Arguments
-- `T`: Type of the elements in the resulting vector. Defaults to [`Float32`](@ref).
-- `start`: The first element in the resulting vector.
-- `finish`: The last element in the resulting vector.
-- `steps`: The number of steps to split the range into.
-
-# Example
-```jldoctest
-julia> linspace(0, 10, 11)
-11-element Vector{Float32}:
-  0.0
-  1.0
-  2.0
-  3.0
-  4.0
-  5.0
-  6.0
-  7.0
-  8.0
-  9.0
- 10.0
-```
-"""
-function linspace(::Type{T}, start, finish, steps::Integer)::AbstractArray{T, 1} where {T <: AbstractFloat}
-    return Array{T}(start:((finish-start)/(steps-1)):finish)
-end
-
-function linspace(start, finish, steps::Integer)::AbstractArray{Float32, 1}
-    return linspace(Float32, start, finish, steps)
-end
-
+using ColorTypes
 
 """
     tensor([T = Float32], img::AbstractArray{RGB, 2})::AbstractArray{T, 3}
@@ -138,6 +81,72 @@ function image(tensor::AbstractArray{T, 3})::AbstractMatrix where {T <: Abstract
     end
 end
 
+export tensor, image
+
+end # module Transform
+
+using .ImageTensorConversion
+
+GPU_BACKEND::Union{Nothing,String} = nothing
+
+"""
+    gpu(arr::AbstractArray)::AbstractArray
+
+The available GPU backends are:
+- CUDA (Nvidia)
+- AMDGPU (AMD)
+- oneAPI (Intel)
+- Metal (Apple)
+
+The extension will be loaded when the GPU backend is loaded. E.g.
+```jldoctest
+julia> using CUDA
+```
+will load the CUDA extension.
+
+If no backend is loaded this function does nothing.
+"""
+function gpu(arr::AbstractArray)::AbstractArray
+    return (isnothing(GPU_BACKEND)) ? arr : gpu(Float32, arr)
+end
+
+
+"""
+    linspace([T = Float32], start, finish, steps::Integer)::AbstractArray{T, 1} where {T <: AbstractFloat}
+
+Returns a vector of elements of type `T` from `start` to `finish` in `steps` steps.
+
+# Arguments
+- `T`: Type of the elements in the resulting vector. Defaults to [`Float32`](@ref).
+- `start`: The first element in the resulting vector.
+- `finish`: The last element in the resulting vector.
+- `steps`: The number of steps to split the range into.
+
+# Example
+```jldoctest
+julia> linspace(0, 10, 11)
+11-element Vector{Float32}:
+  0.0
+  1.0
+  2.0
+  3.0
+  4.0
+  5.0
+  6.0
+  7.0
+  8.0
+  9.0
+ 10.0
+```
+"""
+function linspace(::Type{T}, start, finish, steps::Integer)::AbstractArray{T, 1} where {T <: AbstractFloat}
+    return Array{T}(start:((finish-start)/(steps-1)):finish)
+end
+
+function linspace(start, finish, steps::Integer)::AbstractArray{Float32, 1}
+    return linspace(Float32, start, finish, steps)
+end
+
 
 """
     imshow(img::AbstractArray{T, 2}; show=true, save_to=Nothing) where {T <: Colorant}
@@ -185,6 +194,6 @@ function imread(path::String)::AbstractArray{Float32, 3}
     return imread(Float32, path)
 end
 
-export gpu, linspace, tensor, image, imshow, imread, GPU_BACKEND
+export gpu, linspace, imshow, imread, GPU_BACKEND, ImageTensorConversion
 
 end # module VC
