@@ -1,7 +1,7 @@
 module VC
 
 using Reexport
-@reexport using ColorTypes, FileIO, Zygote, ProgressMeter, LinearAlgebra, Printf
+@reexport using ColorTypes, FileIO, Zygote, ProgressMeter, LinearAlgebra, Printf, Optimization, OptimizationOptimisers
 import ImageView
 
 module ImageTensorConversion
