@@ -1,7 +1,7 @@
 module VC
 
 using Reexport
-@reexport using ColorTypes, FileIO, Zygote, ProgressMeter, LinearAlgebra, Printf, Optimization, OptimizationOptimisers
+@reexport using ColorTypes, FileIO, Zygote, ProgressMeter, LinearAlgebra, Printf, Optimization, OptimizationOptimisers, MeshIO
 import ImageView
 
 module ImageTensorConversion
@@ -76,6 +76,8 @@ function image(tensor::AbstractArray{T, 3})::AbstractMatrix where {T <: Abstract
     sz = size(tensor)
     if (sz[1] == 3)
         return [ RGB(tensor[1, i, j], tensor[2, i, j], tensor[3, i, j]) for i=1:sz[2], j=1:sz[3] ]
+    elseif (sz[1] == 4)
+        return [ RGBA(tensor[1, i, j], tensor[2, i, j], tensor[3, i, j], tensor[4, i, j]) for i=1:sz[2], j=1:sz[3] ]
     else
         return [ Gray(tensor[1, i, j]) for i=1:sz[2], j=1:sz[3] ]
     end
