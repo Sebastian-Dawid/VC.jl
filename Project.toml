@@ -5,6 +5,7 @@ version = "0.1.0"
 
 [deps]
 ColorTypes = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
+ComponentArrays = "b0b7db55-cfe3-40fc-9ded-d10e2dbeff66"
 FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
 ImageView = "86fae568-95e7-573e-a6b2-d8a6b900c9ef"
 KernelAbstractions = "63c18a36-062a-441e-b654-da1e3ab1ce7c"
@@ -31,6 +32,7 @@ oneAPIExt = "oneAPI"
 
 [compat]
 ColorTypes = "0.11.5"
+ComponentArrays = "0.15.25"
 FileIO = "1.16.6"
 ImageView = "0.12.6"
 KernelAbstractions = "0.9.33"
