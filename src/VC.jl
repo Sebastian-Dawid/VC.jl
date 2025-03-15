@@ -1,7 +1,8 @@
 module VC
 
 using Reexport
-@reexport using ColorTypes, FileIO, Zygote, ProgressMeter, LinearAlgebra, Printf, Optimisers, MeshIO, ComponentArrays, StaticArrays, KernelAbstractions
+@reexport using FileIO, Zygote, ProgressMeter, LinearAlgebra, Printf, Optimisers, MeshIO, ComponentArrays, StaticArrays, KernelAbstractions
+@reexport import ColorTypes
 import ImageView
 
 module ImageTensorConversion
@@ -87,7 +88,7 @@ export tensor, image
 
 end # module Transform
 
-using .ImageTensorConversion
+using .ImageTensorConversion, ColorTypes
 
 GPU_BACKEND::Union{Nothing,String} = nothing
 
