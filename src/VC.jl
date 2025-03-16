@@ -1,7 +1,7 @@
 module VC
 
 using Reexport
-@reexport using FileIO, ImageIO, Zygote, ProgressMeter, LinearAlgebra, Printf, Optimisers, MeshIO, ComponentArrays, StaticArrays, KernelAbstractions
+@reexport using FileIO, ImageIO, Zygote, ProgressMeter, LinearAlgebra, Printf, Optimisers, MeshIO, ComponentArrays, StaticArrays, KernelAbstractions, LoopVectorization
 @reexport import ColorTypes
 import ImageView
 
