@@ -43,7 +43,7 @@ Float64
 ```
 """
 function tensor(::Type{T}, img::AbstractArray{U, 2})::AbstractArray{T, 3} where {T <: AbstractFloat, U <: Colorant}
-    return mapreduce(x -> reshape(x, (1, size(img)...)), vcat, [ Float32.(@eval($(Symbol("comp$(i)"))).(img)) for i in 1:length(img[1]) ])
+    return mapreduce(x -> reshape(x, (1, size(img)...)), vcat, [ T.(@eval($(Symbol("comp$(i)"))).(img)) for i in 1:length(img[1]) ])
 end
 
 function tensor(img::AbstractArray{U, 2})::AbstractArray{Float32, 3} where {U <: Colorant}
@@ -76,7 +76,9 @@ RGB{Float64}
 """
 function image(tensor::AbstractArray{T, 3})::AbstractMatrix where {T <: AbstractFloat}
     sz = size(tensor)
-    if (sz[1] == 3)
+    if (sz[1] == 2)
+        return [ GrayA(tensor[1, i, j], tensor[2, i, j]) for i=1:sz[2], j=1:sz[3] ]
+    elseif (sz[1] == 3)
         return [ RGB(tensor[1, i, j], tensor[2, i, j], tensor[3, i, j]) for i=1:sz[2], j=1:sz[3] ]
     elseif (sz[1] == 4)
         return [ RGBA(tensor[1, i, j], tensor[2, i, j], tensor[3, i, j], tensor[4, i, j]) for i=1:sz[2], j=1:sz[3] ]
@@ -94,7 +96,7 @@ using .ImageTensorConversion, ColorTypes
 GPU_BACKEND::Union{Nothing,String} = nothing
 
 """
-    gpu(arr::AbstractArray)::AbstractArray
+    gpu(arr::AbstractArray{T})::AbstractArray{T} where {T}
 
 The available GPU backends are:
 - CUDA (Nvidia)
@@ -110,8 +112,8 @@ will load the CUDA extension.
 
 If no backend is loaded this function does nothing.
 """
-function gpu(arr::AbstractArray)::AbstractArray
-    return (isnothing(GPU_BACKEND)) ? arr : gpu(Float32, arr)
+function gpu(arr::AbstractArray{T})::AbstractArray{T} where {T}
+    return (isnothing(GPU_BACKEND)) ? arr : gpu(T, arr)
 end
 
 
