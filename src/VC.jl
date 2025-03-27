@@ -1,10 +1,10 @@
 module VC
 
 using Reexport
-@reexport using FileIO, ImageIO, Zygote, ProgressMeter, LinearAlgebra, Statistics, Printf, Optimisers, MeshIO, ComponentArrays, StaticArrays, KernelAbstractions, LoopVectorization, ColorVectorSpace
+@reexport using FileIO, ImageIO, MeshIO, Zygote, ProgressMeter, LinearAlgebra, Statistics, Printf, Optimisers, ComponentArrays, StaticArrays, KernelAbstractions, LoopVectorization
 @reexport using ColorTypes: RGB, RGBA, Gray, GrayA
 @reexport import ColorTypes
-import ImageView
+import ImageView, Gtk4
 
 module ImageTensorConversion
 
@@ -171,7 +171,17 @@ function imshow(img::AbstractArray{T, 2}; show=true, save_to=Nothing) where {T <
         save(save_to, img)
     end
     if (show)
-        ImageView.imshow(img)
+        guidict = ImageView.imshow(img)
+        if !isinteractive()
+            c = Condition()
+            win = guidict["gui"]["window"]
+            @async Gtk4.GLib.glib_main()
+            Gtk4.signal_connect(win, :close_request) do widget
+                Gtk4.notify(c)
+            end
+            Gtk4.wait(c)
+	    Gtk4.close(win)
+        end
     end
 end
 
@@ -193,7 +203,7 @@ See also: [`tensor`](@ref), [`image`](@ref), [`imshow`](@ref)
 """
 function imread(::Type{T}, path::String)::AbstractArray{T, 3} where {T <: AbstractFloat}
     img = load(path)
-    return tensor(T, img)
+    return ImageTensorConversion.tensor(T, img)
 end
 
 function imread(path::String)::AbstractArray{Float32, 3}
