@@ -76,6 +76,7 @@ RGB{Float64}
 """
 function image(tensor::AbstractArray{T, 3})::AbstractMatrix where {T <: AbstractFloat}
     sz = size(tensor)
+    tensor = clamp.(tensor, 0, 1)
     if (sz[1] == 2)
         return [ GrayA(tensor[1, i, j], tensor[2, i, j]) for i=1:sz[2], j=1:sz[3] ]
     elseif (sz[1] == 3)
