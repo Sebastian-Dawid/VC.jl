@@ -156,6 +156,41 @@ end
 
 
 """
+    bmm(M::AbstractMatrix{T}, vs::AbstractMatrix{T})::AbstractMatrix{T} where {T <: Real}
+
+This function multiplies the matrix `M` onto every row of the matrix `vs`.
+
+# Arguments
+- `M`: The matrix to multiply onto the rows.
+- `vs`: The vectors to mulltiply `M` onto stored in the rows of a matrix.
+"""
+function bmm(M::AbstractMatrix{T}, vs::AbstractMatrix{T})::AbstractMatrix{T} where {T <: Real}
+    return reduce((a, b) -> cat(a, b; dims=1), map(x -> x' * M', eachrow(vs)))
+end
+
+
+"""
+    makegrid(
+        images::AbstractVecOrMat{<:AbstractArray{T, 3}},
+        dims::NTuple{2, <:Integer}
+        )::AbstractArray{T, 3} where {T <: AbstractFloat}
+
+Aranges the `images` in a grid.
+
+# Arguments
+- `images`: The images to arange in a grid.
+- `dims`: The dimensions of the grid.
+"""
+function makegrid(
+    images::AbstractVecOrMat{<:AbstractArray{T, 3}},
+    dims::NTuple{2, <:Integer}
+    )::AbstractArray{T, 3} where {T <: AbstractFloat}
+    grid = permutedims(reshape(images, dims...))
+    return cat([ cat(grid[i, :]...; dims=3) for i in axes(grid, 1) ]...; dims=2)
+end
+
+
+"""
     imshow(img::AbstractArray{T, 2}; show=true, save_to=Nothing) where {T <: Colorant}
 
 Shows and/or saves the given image. Waits until the image is closed.
@@ -211,6 +246,6 @@ function imread(path::String)::AbstractArray{Float32, 3}
     return imread(Float32, path)
 end
 
-export gpu, linspace, imshow, imread, GPU_BACKEND, ImageTensorConversion
+export gpu, linspace, makegrid, bmm, imshow, imread, GPU_BACKEND, ImageTensorConversion
 
 end # module VC
