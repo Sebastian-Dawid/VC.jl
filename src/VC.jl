@@ -119,6 +119,43 @@ end
 
 
 """
+    linspace([T = Float32], start, finish, steps::Integer)::AbstractArray{T, 1} where {T <: AbstractFloat}
+
+Returns a vector of elements of type `T` from `start` to `finish` in `steps` steps.
+
+# Arguments
+- `T`: Type of the elements in the resulting vector. Defaults to [`Float32`](@ref).
+- `start`: The first element in the resulting vector.
+- `finish`: The last element in the resulting vector.
+- `steps`: The number of steps to split the range into.
+
+# Example
+```jldoctest
+julia> linspace(0, 10, 11)
+11-element Vector{Float32}:
+  0.0
+  1.0
+  2.0
+  3.0
+  4.0
+  5.0
+  6.0
+  7.0
+  8.0
+  9.0
+ 10.0
+```
+"""
+function linspace(::Type{T}, start, finish, steps::Integer)::AbstractArray{T, 1} where {T <: AbstractFloat}
+    return Array{T}(start:((finish-start)/(steps-1)):finish)
+end
+
+function linspace(start, finish, steps::Integer)::AbstractArray{Float32, 1}
+    return linspace(Float32, start, finish, steps)
+end
+
+
+"""
     bmm(M::AbstractMatrix{T}, vs::AbstractMatrix{T})::AbstractMatrix{T} where {T <: Real}
 
 This function multiplies the matrix `M` onto every row of the matrix `vs`.
@@ -143,20 +180,12 @@ Aranges the `images` in a grid.
 # Arguments
 - `images`: The images to arange in a grid.
 - `dims`: The dimensions of the grid.
-
-# Example
-```jldoctest
-julia> images = [ rand(3, 64, 64) for _ in 1:16 ]; # 16 images of random noise
-julia> grid = makegrid(images, (4, 4));
-julia> size(grid)
-(3, 1024, 1024)
-```
 """
 function makegrid(
     images::AbstractVecOrMat{<:AbstractArray{T, 3}},
     dims::NTuple{2, <:Integer}
     )::AbstractArray{T, 3} where {T <: AbstractFloat}
-    grid = reshape(images, dims...)
+    grid = permutedims(reshape(images, dims...))
     return cat([ cat(grid[i, :]...; dims=3) for i in axes(grid, 1) ]...; dims=2)
 end
 
@@ -217,6 +246,6 @@ function imread(path::String)::AbstractArray{Float32, 3}
     return imread(Float32, path)
 end
 
-export gpu, makegrid, bmm, imshow, imread, GPU_BACKEND, ImageTensorConversion
+export gpu, linspace, makegrid, bmm, imshow, imread, GPU_BACKEND, ImageTensorConversion
 
 end # module VC
