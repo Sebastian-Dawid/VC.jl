@@ -180,12 +180,20 @@ Aranges the `images` in a grid.
 # Arguments
 - `images`: The images to arange in a grid.
 - `dims`: The dimensions of the grid.
+
+# Example
+```jldoctest
+julia> images = [ rand(3, 64, 64) for _ in 1:16 ]; # 16 images of random noise
+julia> grid = makegrid(images, (4, 4));
+julia> size(grid)
+(3, 1024, 1024)
+```
 """
 function makegrid(
     images::AbstractVecOrMat{<:AbstractArray{T, 3}},
     dims::NTuple{2, <:Integer}
     )::AbstractArray{T, 3} where {T <: AbstractFloat}
-    grid = permutedims(reshape(images, dims...))
+    grid = reshape(images, dims...)
     return cat([ cat(grid[i, :]...; dims=3) for i in axes(grid, 1) ]...; dims=2)
 end
 
