@@ -1,9 +1,11 @@
 module VC
 
 using Reexport
-@reexport using FileIO, ImageIO, MeshIO, Zygote, ProgressMeter, LinearAlgebra, Statistics, Printf, Optimisers, ComponentArrays, StaticArrays, KernelAbstractions, LoopVectorization
-@reexport using ColorTypes: RGB, RGBA, Gray, GrayA
-@reexport import ColorTypes
+@reexport using FileIO, ImageIO, MeshIO
+@reexport using LinearAlgebra, Statistics, Printf, ProgressMeter
+@reexport using ComponentArrays, StaticArrays, KernelAbstractions
+@reexport using Zygote, Optimisers
+@reexport import ColorTypes, Lux
 import ImageView, Gtk4
 
 module ImageTensorConversion
@@ -13,7 +15,7 @@ using ColorTypes
 """
     tensor([T = Float32], img::AbstractArray{RGB, 2})::AbstractArray{T, 3}
 
-Converts an image to a CxHxW tensor. [`image`](@ref) is the inverse to this function.
+Converts an image to a HxWxC tensor. [`image`](@ref) is the inverse to this function.
 
 See also: [`image`](@ref), [`imshow`](@ref), [`imread`](@ref).
 
@@ -31,7 +33,7 @@ julia> size(img)
 julia> t = img |> tensor;
 
 julia> size(t)
-(3, 144, 256)
+(144, 256, 3)
 
 julia> typeof(t[1])
 Float32
@@ -43,7 +45,7 @@ Float64
 ```
 """
 function tensor(::Type{T}, img::AbstractArray{U, 2})::AbstractArray{T, 3} where {T <: AbstractFloat, U <: Colorant}
-    return mapreduce(x -> reshape(x, (1, size(img)...)), vcat, [ T.(@eval($(Symbol("comp$(i)"))).(img)) for i in 1:length(img[1]) ])
+    return reduce((a, b) -> cat(a, b; dims=3), [ T.(@eval($(Symbol("comp$(i)"))).(img)) for i in 1:length(img[1]) ])
 end
 
 function tensor(img::AbstractArray{U, 2})::AbstractArray{Float32, 3} where {U <: Colorant}
@@ -63,7 +65,7 @@ See also: [`tensor`](@ref), [`imshow`](@ref), [`imread`](@ref).
 
 # Example
 ```jldoctest
-julia> t = rand(3, 144, 256); # image data of an RGB 256x144 image
+julia> t = rand(144, 256, 3); # image data of an RGB 256x144 image
 
 julia> img = t |> image; # 144x256 matrix containing RGB values
 
@@ -77,14 +79,14 @@ RGB{Float64}
 function image(tensor::AbstractArray{T, 3})::AbstractMatrix where {T <: AbstractFloat}
     sz = size(tensor)
     tensor = clamp.(tensor, 0, 1)
-    if (sz[1] == 2)
-        return [ GrayA(tensor[1, i, j], tensor[2, i, j]) for i=1:sz[2], j=1:sz[3] ]
-    elseif (sz[1] == 3)
-        return [ RGB(tensor[1, i, j], tensor[2, i, j], tensor[3, i, j]) for i=1:sz[2], j=1:sz[3] ]
-    elseif (sz[1] == 4)
-        return [ RGBA(tensor[1, i, j], tensor[2, i, j], tensor[3, i, j], tensor[4, i, j]) for i=1:sz[2], j=1:sz[3] ]
+    if (sz[3] == 2)
+        return [ GrayA(tensor[i, j, 1], tensor[i, j, 2]) for i=1:sz[1], j=1:sz[2] ]
+    elseif (sz[3] == 3)
+        return [ RGB(tensor[i, j, 1], tensor[i, j, 2], tensor[i, j, 3]) for i=1:sz[1], j=1:sz[2] ]
+    elseif (sz[3] == 4)
+        return [ RGBA(tensor[i, j, 1], tensor[i, j, 2], tensor[i, j, 3], tensor[i, j, 4]) for i=1:sz[1], j=1:sz[2] ]
     else
-        return [ Gray(tensor[1, i, j]) for i=1:sz[2], j=1:sz[3] ]
+        return [ Gray(tensor[i, j, 1]) for i=1:sz[1], j=1:sz[2] ]
     end
 end
 
@@ -156,7 +158,7 @@ end
 
 
 """
-    bmm(M::AbstractMatrix{T}, vs::AbstractMatrix{T})::AbstractMatrix{T} where {T <: Real}
+    row_mul(M::AbstractMatrix{T}, vs::AbstractMatrix{T})::AbstractMatrix{T} where {T <: Real}
 
 This function multiplies the matrix `M` onto every row of the matrix `vs`.
 
@@ -164,7 +166,7 @@ This function multiplies the matrix `M` onto every row of the matrix `vs`.
 - `M`: The matrix to multiply onto the rows.
 - `vs`: The vectors to mulltiply `M` onto stored in the rows of a matrix.
 """
-function bmm(M::AbstractMatrix{T}, vs::AbstractMatrix{T})::AbstractMatrix{T} where {T <: Real}
+function row_mul(M::AbstractMatrix{T}, vs::AbstractMatrix{T})::AbstractMatrix{T} where {T <: Real}
     return reduce((a, b) -> cat(a, b; dims=1), map(x -> x' * M', eachrow(vs)))
 end
 
@@ -183,10 +185,10 @@ Aranges the `images` in a grid.
 
 # Example
 ```jldoctest
-julia> images = [ rand(3, 64, 64) for _ in 1:16 ]; # 16 images of random noise
+julia> images = [ rand(64, 64, 3) for _ in 1:16 ]; # 16 images of random noise
 julia> grid = makegrid(images, (4, 4));
 julia> size(grid)
-(3, 1024, 1024)
+(1024, 1024, 3)
 ```
 """
 function makegrid(
@@ -194,7 +196,7 @@ function makegrid(
     dims::NTuple{2, <:Integer}
     )::AbstractArray{T, 3} where {T <: AbstractFloat}
     grid = reshape(images, dims...)
-    return cat([ cat(grid[i, :]...; dims=3) for i in axes(grid, 1) ]...; dims=2)
+    return cat([ cat(grid[i, :]...; dims=2) for i in axes(grid, 1) ]...; dims=1)
 end
 
 
@@ -254,6 +256,6 @@ function imread(path::String)::AbstractArray{Float32, 3}
     return imread(Float32, path)
 end
 
-export gpu, linspace, makegrid, bmm, imshow, imread, GPU_BACKEND, ImageTensorConversion
+export gpu, linspace, makegrid, row_mul, imshow, imread, GPU_BACKEND, ImageTensorConversion
 
 end # module VC
