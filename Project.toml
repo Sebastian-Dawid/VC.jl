@@ -4,8 +4,8 @@ authors = ["Sebastian Emanuel Dawid <sdawid@techfak.uni-bielefeld.de>"]
 version = "0.1.0"
 
 [deps]
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
 ColorTypes = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
-ComponentArrays = "b0b7db55-cfe3-40fc-9ded-d10e2dbeff66"
 FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
 FixedPointNumbers = "53c48c17-4a7d-5ca2-90c5-79b7896eea93"
 ImageIO = "82e4d734-157c-48bb-816b-45c225c6df19"
@@ -26,21 +26,21 @@ Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 [weakdeps]
 AMDGPU = "21141c5a-9bdb-4563-92ae-f87d6854732e"
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
-Metal = "dde4c033-4e86-420c-a63e-0dd931031962"
-oneAPI = "8f75cd03-7ff8-4ecb-9b8f-daf728133b1b"
 Gtk4 = "9db2cae5-386f-4011-9d63-a5602296539b"
 ImageView = "86fae568-95e7-573e-a6b2-d8a6b900c9ef"
+Metal = "dde4c033-4e86-420c-a63e-0dd931031962"
+oneAPI = "8f75cd03-7ff8-4ecb-9b8f-daf728133b1b"
 
 [extensions]
 AMDGPUExt = "AMDGPU"
 CUDAExt = "CUDA"
+ImageViewExt = "ImageView"
 MetalExt = "Metal"
 oneAPIExt = "oneAPI"
-ImageViewExt = "ImageView"
 
 [compat]
+CairoMakie = "0.13.2"
 ColorTypes = "0.11.5"
-ComponentArrays = "0.15.25"
 FileIO = "1.16.6"
 FixedPointNumbers = "0.8.5"
 ImageIO = "0.6.9"

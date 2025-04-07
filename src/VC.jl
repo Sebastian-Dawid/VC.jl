@@ -1,9 +1,9 @@
 module VC
 
 using Reexport
-@reexport using FileIO, ImageIO, MeshIO
+@reexport using FileIO, ImageIO, MeshIO, CairoMakie
 @reexport using LinearAlgebra, Statistics, Printf, Random, ProgressMeter
-@reexport using ComponentArrays, StaticArrays, KernelAbstractions
+@reexport using StaticArrays, KernelAbstractions
 @reexport using Lux, Zygote, Optimisers
 @reexport import ColorTypes
 
@@ -223,12 +223,21 @@ function imshow(img::AbstractArray{T, 2}; show=true, save_to=Nothing) where {T <
         save(save_to, img)
     end
     if (show)
-        imshow(nothing, img)
+        if (IMAGEVIEW_LOADED) # use ImageView backend for displaying images if it is loaded
+            imshow(nothing, img)
+            return
+        end
+        f = Figure()
+        ax = Axis(f[1, 1])
+        hidedecorations!(ax)
+        hidespines!(ax)
+        CairoMakie.image!(ax, rotr90(img); interpolate=false)
+	return current_figure()
     end
 end
 
 function imshow(img::AbstractArray{T, 3}; show=true, save_to=Nothing) where {T <: AbstractFloat}
-    imshow(img |> image; show=show, save_to=save_to)
+    imshow(img |> ImageTensorConversion.image; show=show, save_to=save_to)
 end
 
 
