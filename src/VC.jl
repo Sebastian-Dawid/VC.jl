@@ -4,9 +4,8 @@ using Reexport
 @reexport using FileIO, ImageIO, MeshIO
 @reexport using LinearAlgebra, Statistics, Printf, Random, ProgressMeter
 @reexport using ComponentArrays, StaticArrays, KernelAbstractions
-@reexport using Zygote, Optimisers
-@reexport import ColorTypes, Lux
-import ImageView, Gtk4
+@reexport using Lux, Zygote, Optimisers
+@reexport import ColorTypes
 
 module ImageTensorConversion
 
@@ -97,6 +96,7 @@ end # module Transform
 using .ImageTensorConversion, ColorTypes
 
 GPU_BACKEND::Union{Nothing,String} = nothing
+IMAGEVIEW_LOADED::Bool = false
 
 """
     gpu(arr::AbstractArray{T})::AbstractArray{T} where {T}
@@ -171,6 +171,13 @@ function row_mul(M::AbstractMatrix{T}, vs::AbstractMatrix{T})::AbstractMatrix{T}
 end
 
 
+function orthogonalize(M::AbstractMatrix{T})::AbstractMatrix{T} where {T <: AbstractFloat}
+	v₁ = normalize(M[:, 1])
+	v₃ = normalize(v₁ × M[:, 2])
+	return cat(v₁, v₁ × v₃, v₃; dims=2)
+end
+
+
 """
     makegrid(
         images::AbstractVecOrMat{<:AbstractArray{T, 3}},
@@ -199,7 +206,6 @@ function makegrid(
     return cat([ cat(grid[i, :]...; dims=2) for i in axes(grid, 1) ]...; dims=1)
 end
 
-
 """
     imshow(img::AbstractArray{T, 2}; show=true, save_to=Nothing) where {T <: Colorant}
 
@@ -217,17 +223,7 @@ function imshow(img::AbstractArray{T, 2}; show=true, save_to=Nothing) where {T <
         save(save_to, img)
     end
     if (show)
-        guidict = ImageView.imshow(img)
-        if !isinteractive()
-            c = Condition()
-            win = guidict["gui"]["window"]
-            @async Gtk4.GLib.glib_main()
-            Gtk4.signal_connect(win, :close_request) do widget
-                Gtk4.notify(c)
-            end
-            Gtk4.wait(c)
-	    Gtk4.close(win)
-        end
+        imshow(nothing, img)
     end
 end
 
@@ -256,6 +252,6 @@ function imread(path::String)::AbstractArray{Float32, 3}
     return imread(Float32, path)
 end
 
-export gpu, linspace, makegrid, row_mul, imshow, imread, GPU_BACKEND, ImageTensorConversion
+export gpu, linspace, makegrid, row_mul, orthogonalize, imshow, imread, GPU_BACKEND, IMAGEVIEW_LOADED, ImageTensorConversion
 
 end # module VC
