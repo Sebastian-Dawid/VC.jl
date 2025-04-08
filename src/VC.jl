@@ -97,6 +97,19 @@ using .ImageTensorConversion, ColorTypes
 
 GPU_BACKEND::Union{Nothing,String} = nothing
 IMAGEVIEW_LOADED::Bool = false
+SHOW_BY_DEFAULT::Bool = true
+
+"""
+    show_by_default!(value::Bool)
+
+Sets wether or not to show the image when calling [`imshow`](@ref) by default.
+
+# Arguments
+- `value`: New value for the flag.
+"""
+function show_by_default!(value::Bool)
+    VC.SHOW_BY_DEFAULT = value
+end
 
 """
     gpu(arr::AbstractArray{T})::AbstractArray{T} where {T}
@@ -218,7 +231,7 @@ See also: [`imread`](@ref), [`image`](@ref), [`tensor`](@ref).
 - `show`: Determines wheter the image should be displayed.
 - `save_to`: Location to save the image to. Defaults to [`Nothing`](@ref) which will not save the image.
 """
-function imshow(img::AbstractArray{T, 2}; show=true, save_to=Nothing) where {T <: Colorant}
+function imshow(img::AbstractArray{T, 2}; show=SHOW_BY_DEFAULT, save_to=Nothing) where {T <: Colorant}
     if (save_to != Nothing)
         save(save_to, img)
     end
@@ -232,11 +245,11 @@ function imshow(img::AbstractArray{T, 2}; show=true, save_to=Nothing) where {T <
         hidedecorations!(ax)
         hidespines!(ax)
         CairoMakie.image!(ax, rotr90(img); interpolate=false)
-	return current_figure()
+	display(current_figure())
     end
 end
 
-function imshow(img::AbstractArray{T, 3}; show=true, save_to=Nothing) where {T <: AbstractFloat}
+function imshow(img::AbstractArray{T, 3}; show=SHOW_BY_DEFAULT, save_to=Nothing) where {T <: AbstractFloat}
     imshow(img |> ImageTensorConversion.image; show=show, save_to=save_to)
 end
 
@@ -261,6 +274,6 @@ function imread(path::String)::AbstractArray{Float32, 3}
     return imread(Float32, path)
 end
 
-export gpu, linspace, makegrid, row_mul, orthogonalize, imshow, imread, GPU_BACKEND, IMAGEVIEW_LOADED, ImageTensorConversion
+export show_by_default!, gpu, linspace, makegrid, row_mul, orthogonalize, imshow, imread, GPU_BACKEND, IMAGEVIEW_LOADED, ImageTensorConversion
 
 end # module VC
