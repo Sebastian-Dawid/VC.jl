@@ -241,11 +241,11 @@ function imshow(img::AbstractArray{T, 2}; show=SHOW_BY_DEFAULT, save_to=Nothing)
             return
         end
         f = Figure()
-        ax = Axis(f[1, 1])
+        ax = Axis(f[1, 1]; aspect = DataAspect())
         hidedecorations!(ax)
         hidespines!(ax)
         CairoMakie.image!(ax, rotr90(img); interpolate=false)
-	display(current_figure())
+        display(current_figure())
     end
 end
 
