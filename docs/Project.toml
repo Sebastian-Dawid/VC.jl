@@ -1,0 +1,3 @@
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+VC = "c4486bb8-a42d-46a1-aa94-c7ce885e71cb"

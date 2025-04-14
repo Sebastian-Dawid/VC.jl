@@ -16,14 +16,14 @@ using ColorTypes
 
 Converts an image to a HxWxC tensor. [`image`](@ref) is the inverse to this function.
 
-See also: [`image`](@ref), [`imshow`](@ref), [`imread`](@ref).
+See also: [`image`](@ref), [`VC.imshow`](@ref), [`VC.imread`](@ref).
 
 # Arguments
-- `T`: Type of the elements of the resulting tensor. Defaults to [`Float32`](@ref).
+- `T`: Type of the elements of the resulting tensor. Defaults to `Float32`.
 - `img`: HxW matrix containing the RGB values of the image.
 
 # Example
-```jldoctest
+```jldoctest; setup = :(using VC.ImageTensorConversion; using VC.ColorTypes: RGB)
 julia> img = rand(RGB, 144, 256);
 
 julia> size(img)
@@ -57,13 +57,13 @@ end
 
 Converts a CxHxW tensor to a displayable image. [`tensor`](@ref) is the inverse to this function.
 
-See also: [`tensor`](@ref), [`imshow`](@ref), [`imread`](@ref).
+See also: [`tensor`](@ref), [`VC.imshow`](@ref), [`VC.imread`](@ref).
 
 # Arguments
 - `t`: CxHxW tensor containing the color data of an image
 
 # Example
-```jldoctest
+```jldoctest; setup = :(using VC.ImageTensorConversion; using VC.ColorTypes: RGB)
 julia> t = rand(144, 256, 3); # image data of an RGB 256x144 image
 
 julia> img = t |> image; # 144x256 matrix containing RGB values
@@ -121,7 +121,7 @@ The available GPU backends are:
 - Metal (Apple)
 
 The extension will be loaded when the GPU backend is loaded. E.g.
-```jldoctest
+```julia
 julia> using CUDA
 ```
 will load the CUDA extension.
@@ -139,7 +139,7 @@ end
 Returns a vector of elements of type `T` from `start` to `finish` in `steps` steps.
 
 # Arguments
-- `T`: Type of the elements in the resulting vector. Defaults to [`Float32`](@ref).
+- `T`: Type of the elements in the resulting vector. Defaults to `Float32`.
 - `start`: The first element in the resulting vector.
 - `finish`: The last element in the resulting vector.
 - `steps`: The number of steps to split the range into.
@@ -206,9 +206,11 @@ Aranges the `images` in a grid.
 # Example
 ```jldoctest
 julia> images = [ rand(64, 64, 3) for _ in 1:16 ]; # 16 images of random noise
+
 julia> grid = makegrid(images, (4, 4));
+
 julia> size(grid)
-(1024, 1024, 3)
+(256, 256, 3)
 ```
 """
 function makegrid(
@@ -224,12 +226,12 @@ end
 
 Shows and/or saves the given image. Waits until the image is closed.
 
-See also: [`imread`](@ref), [`image`](@ref), [`tensor`](@ref).
+See also: [`imread`](@ref), [`ImageTensorConversion.image`](@ref), [`tensor`](@ref).
 
 # Arguments
 - `img`: The image to display and/or save.
 - `show`: Determines wheter the image should be displayed.
-- `save_to`: Location to save the image to. Defaults to [`Nothing`](@ref) which will not save the image.
+- `save_to`: Location to save the image to. Defaults to `Nothing` which will not save the image.
 """
 function imshow(img::AbstractArray{T, 2}; show=SHOW_BY_DEFAULT, save_to=Nothing) where {T <: Colorant}
     if (save_to != Nothing)
@@ -259,10 +261,10 @@ end
 
 Loads the given image as a CxHxW tensor.
 
-See also: [`tensor`](@ref), [`image`](@ref), [`imshow`](@ref)
+See also: [`tensor`](@ref), [`ImageTensorConversion.image`](@ref), [`imshow`](@ref)
 
 # Arguments
-- `T`: Type of the elements of the resulting tensor. Defaults to [`Float32`](@ref).
+- `T`: Type of the elements of the resulting tensor. Defaults to `Float32`.
 - `path`: Path to the image to load.
 """
 function imread(::Type{T}, path::String)::AbstractArray{T, 3} where {T <: AbstractFloat}
