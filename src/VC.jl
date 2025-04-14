@@ -259,7 +259,7 @@ end
 """
     imread([T = Float32], path::String)::AbstractArray{T, 3} where {T <: AbstractFloat}
 
-Loads the given image as a CxHxW tensor.
+Loads the given image as a HxWxC tensor.
 
 See also: [`tensor`](@ref), [`ImageTensorConversion.image`](@ref), [`imshow`](@ref)
 
