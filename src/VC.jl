@@ -55,12 +55,12 @@ end
 """
     image(t::AbstractArray{T, 3})::AbstractArray{U, 2} where {T <: AbstractFloat, U <: Colorant}
 
-Converts a CxHxW tensor to a displayable image. [`tensor`](@ref) is the inverse to this function.
+Converts a HxWxC tensor to a displayable image. [`tensor`](@ref) is the inverse to this function.
 
 See also: [`tensor`](@ref), [`VC.imshow`](@ref), [`VC.imread`](@ref).
 
 # Arguments
-- `t`: CxHxW tensor containing the color data of an image
+- `t`: HxWxC tensor containing the color data of an image
 
 # Example
 ```jldoctest; setup = :(using VC.ImageTensorConversion; using VC.ColorTypes: RGB)
