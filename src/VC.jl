@@ -184,10 +184,18 @@ function row_mul(M::AbstractMatrix{T}, vs::AbstractMatrix{T})::AbstractMatrix{T}
 end
 
 
+"""
+	orthogonalize(M::AbstractMatrix{T})::AbstractMatrix{T} where {T <: AbstractFloat}
+
+Computes the orthogonal basis to the two column vectors defined in the matrix `M` as a matrix.
+
+# Arguments
+- `M`: The matrix containing the two vectors to compute the basis for.
+"""
 function orthogonalize(M::AbstractMatrix{T})::AbstractMatrix{T} where {T <: AbstractFloat}
 	v₁ = normalize(M[:, 1])
 	v₃ = normalize(v₁ × M[:, 2])
-	return cat(v₁, v₁ × v₃, v₃; dims=2)
+	return cat(v₁, v₃ × v₁, v₃; dims=2)
 end
 
 
