@@ -200,6 +200,47 @@ end
 
 
 """
+	rotation_from_axis_angle(axis::AbstractVector{T}, θ::T) where {T <: AbstractFloat}
+
+Computes a 3x3 rotation matrix from a given axis and angle.
+
+# Arguments
+- `axis`: The axis to rotate around.
+- `θ`: The angle to rotate by.
+"""
+function rotation_from_axis_angle(axis::AbstractVector{T}, θ::T) where {T <: AbstractFloat}
+	normalized_axis = normalize(axis)
+	ux, uy, uz = normalized_axis
+
+	K = [0 -uz uy; uz 0 -ux; -uy ux 0]
+	outer = normalized_axis * transpose(normalized_axis)
+
+	cosₜ = cos(θ)
+	sinₜ = sin(θ)
+
+	return cosₜ * I + (1 - cosₜ) * outer + sinₜ * K
+end
+
+
+"""
+	rotation_from_quaternion(quaternion::AbstractVector{T}) where { T <: AbstractFloat }
+
+Computes a 3x3 rotation matrix from a given quaternion.
+
+# Arguments
+- `quaternion`: The quaternion encoding the rotation.
+"""
+function rotation_from_quaternion(quaternion::AbstractVector{T}) where { T <: AbstractFloat }
+	w, x, y, z = normalize(quaternion)
+	return [
+		1 - 2*y^2 - 2*z^2   2*x*y - 2*w*z       2*x*z + 2*w*y;
+		2*x*y + 2*w*z       1 - 2*x^2 - 2*z^2   2*y*z - 2*w*x;
+		2*x*z - 2*w*y       2*y*z + 2*w*x       1 - 2*x^2 - 2*y^2
+	]
+end
+
+
+"""
     makegrid(
         images::AbstractVecOrMat{<:AbstractArray{T, 3}},
         dims::NTuple{2, <:Integer}
@@ -284,6 +325,6 @@ function imread(path::String)::AbstractArray{Float32, 3}
     return imread(Float32, path)
 end
 
-export show_by_default!, gpu, linspace, makegrid, row_mul, orthogonalize, imshow, imread, GPU_BACKEND, IMAGEVIEW_LOADED, ImageTensorConversion
+export show_by_default!, gpu, linspace, makegrid, row_mul, orthogonalize, rotation_from_axis_angle, rotation_from_quaternion, imshow, imread, GPU_BACKEND, IMAGEVIEW_LOADED, ImageTensorConversion
 
 end # module VC

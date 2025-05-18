@@ -1,0 +1,10 @@
+name = "Visual Computing"
+
+[deps]
+JLD2 = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
+PackageCompiler = "9b87118b-4619-50d2-8e1e-99f35a4d4d9d"
+TestReports = "dcd651b4-b50a-5b6b-8f22-87e9f253a252"
+VC = "c4486bb8-a42d-46a1-aa94-c7ce885e71cb"
+
+[sources]
+VC = {url = "https://github.com/Sebastian-Dawid/VC.jl"}
