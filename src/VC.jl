@@ -241,6 +241,19 @@ end
 
 
 """
+	expand_to_4x4(matrix::AbstractMatrix{T}) where {T}
+
+Expands a 3x3 matrix to a 4x4 matrix. The element at `[4,4]` will be a `1`.
+
+# Arguments
+- `matrix`: The 3x3 matrix to expand.
+"""
+function expand_to_4x4(matrix::AbstractMatrix{T}) where {T}
+	return cat(cat(matrix, [0 0 0]; dims=1), [0, 0, 0, 1]; dims=2)
+end
+
+
+"""
     makegrid(
         images::AbstractVecOrMat{<:AbstractArray{T, 3}},
         dims::NTuple{2, <:Integer}
@@ -268,6 +281,13 @@ function makegrid(
     )::AbstractArray{T, 3} where {T <: AbstractFloat}
     grid = reshape(images, dims...)
     return cat([ cat(grid[i, :]...; dims=2) for i in axes(grid, 1) ]...; dims=1)
+end
+
+function makegrid(
+	images::AbstractArray{T, 4},
+	dims::NTuple{2, <:Integer}
+	)::AbstractArray{T, 3} where {T <: AbstractFloat}
+	return makegrid(eachslice(images; dims=4), dims)
 end
 
 """
