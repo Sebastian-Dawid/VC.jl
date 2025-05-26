@@ -345,6 +345,6 @@ function imread(path::String)::AbstractArray{Float32, 3}
     return imread(Float32, path)
 end
 
-export show_by_default!, gpu, linspace, makegrid, row_mul, orthogonalize, rotation_from_axis_angle, rotation_from_quaternion, imshow, imread, GPU_BACKEND, IMAGEVIEW_LOADED, ImageTensorConversion
+export show_by_default!, gpu, linspace, makegrid, row_mul, orthogonalize, expand_to_4x4, rotation_from_axis_angle, rotation_from_quaternion, imshow, imread, GPU_BACKEND, IMAGEVIEW_LOADED, ImageTensorConversion
 
 end # module VC
