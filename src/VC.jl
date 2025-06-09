@@ -2,7 +2,7 @@ module VC
 
 using Reexport
 @reexport using FileIO, ImageIO, MeshIO, CairoMakie, JSON
-@reexport using LinearAlgebra, Statistics, Printf, Random, ProgressMeter
+@reexport using LinearAlgebra, Statistics, Printf, Random, ProgressMeter, SpecialFunctions
 @reexport using StaticArrays, KernelAbstractions
 @reexport using Lux, Zygote, Optimisers
 @reexport import ColorTypes
