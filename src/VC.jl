@@ -1,10 +1,13 @@
 module VC
 
 using Reexport
-@reexport using FileIO, ImageIO, MeshIO, CairoMakie, JSON
+@reexport using FileIO, ImageIO, MeshIO, JSON
+@reexport import CairoMakie
+@reexport using CairoMakie: @L_str, current_figure, Figure, Axis3, scatter, scatter!, linesegments, linesegments!
 @reexport using LinearAlgebra, Statistics, Printf, Random, ProgressMeter, SpecialFunctions
 @reexport using StaticArrays, KernelAbstractions
-@reexport using Lux, Zygote, Optimisers
+@reexport using Lux, Optimisers
+@reexport import Zygote, Enzyme
 @reexport import ColorTypes
 
 module ImageTensorConversion
@@ -91,7 +94,7 @@ end
 
 export tensor, image
 
-end # module Transform
+end # module ImageTensorConversion
 
 using .ImageTensorConversion, ColorTypes
 
@@ -110,6 +113,7 @@ Sets wether or not to show the image when calling [`imshow`](@ref) by default.
 function show_by_default!(value::Bool)
     VC.SHOW_BY_DEFAULT = value
 end
+
 
 """
     gpu(arr::AbstractArray{T})::AbstractArray{T} where {T}
@@ -130,58 +134,7 @@ If no backend is loaded this function does nothing.
 """
 function gpu(arr::AbstractArray{T})::AbstractArray{T} where {T}
     return (isnothing(GPU_BACKEND)) ? arr : gpu(T, arr)
-end
-
-
-"""
-    linspace([T = Float32], start, finish, steps::Integer)::AbstractArray{T, 1} where {T <: AbstractFloat}
-
-Returns a vector of elements of type `T` from `start` to `finish` in `steps` steps.
-
-# Arguments
-- `T`: Type of the elements in the resulting vector. Defaults to `Float32`.
-- `start`: The first element in the resulting vector.
-- `finish`: The last element in the resulting vector.
-- `steps`: The number of steps to split the range into.
-
-# Example
-```jldoctest
-julia> linspace(0, 10, 11)
-11-element Vector{Float32}:
-  0.0
-  1.0
-  2.0
-  3.0
-  4.0
-  5.0
-  6.0
-  7.0
-  8.0
-  9.0
- 10.0
-```
-"""
-function linspace(::Type{T}, start, finish, steps::Integer)::AbstractArray{T, 1} where {T <: AbstractFloat}
-    return Array{T}(start:((finish-start)/(steps-1)):finish)
-end
-
-function linspace(start, finish, steps::Integer)::AbstractArray{Float32, 1}
-    return linspace(Float32, start, finish, steps)
-end
-
-
-"""
-    row_mul(M::AbstractMatrix{T}, vs::AbstractMatrix{T})::AbstractMatrix{T} where {T <: Real}
-
-This function multiplies the matrix `M` onto every row of the matrix `vs`.
-
-# Arguments
-- `M`: The matrix to multiply onto the rows.
-- `vs`: The vectors to mulltiply `M` onto stored in the rows of a matrix.
-"""
-function row_mul(M::AbstractMatrix{T}, vs::AbstractMatrix{T})::AbstractMatrix{T} where {T <: Real}
-    return reduce((a, b) -> cat(a, b; dims=1), map(x -> x' * M', eachrow(vs)))
-end
+end 
 
 
 """
@@ -312,9 +265,9 @@ function imshow(img::AbstractArray{T, 2}; show=SHOW_BY_DEFAULT, save_to=Nothing)
             return
         end
         f = Figure()
-        ax = Axis(f[1, 1]; aspect = DataAspect())
-        hidedecorations!(ax)
-        hidespines!(ax)
+        ax = CairoMakie.Axis(f[1, 1]; aspect = CairoMakie.DataAspect())
+        CairoMakie.hidedecorations!(ax)
+        CairoMakie.hidespines!(ax)
         CairoMakie.image!(ax, rotr90(img); interpolate=false)
         display(current_figure())
     end
@@ -345,6 +298,7 @@ function imread(path::String)::AbstractArray{Float32, 3}
     return imread(Float32, path)
 end
 
-export show_by_default!, gpu, linspace, makegrid, row_mul, orthogonalize, expand_to_4x4, rotation_from_axis_angle, rotation_from_quaternion, imshow, imread, GPU_BACKEND, IMAGEVIEW_LOADED, ImageTensorConversion
+export show_by_default!, gpu, makegrid, orthogonalize, expand_to_4x4, rotation_from_axis_angle, rotation_from_quaternion,
+    imshow, imread, GPU_BACKEND, IMAGEVIEW_LOADED, ImageTensorConversion
 
 end # module VC
