@@ -19,15 +19,20 @@ You can find the documentation of the most important reexported packages here:
 * Machine Learning: [Lux](https://lux.csail.mit.edu/stable/)
 * Plotting: [Makie](https://docs.makie.org/stable/)
 * Optimization: [Optimisers](https://fluxml.ai/Optimisers.jl/stable/)
-* Automatic Differentiation: [Zygote](https://fluxml.ai/Zygote.jl/stable/)
+* Automatic Differentiation:
+    * [Zygote](https://fluxml.ai/Zygote.jl/stable/)
+    * [Enzyme](https://enzyme.mit.edu/julia/stable/)
 
 The full reexport looks like this:
 ```julia
 using Reexport
-@reexport using FileIO, ImageIO, MeshIO, CairoMakie
-@reexport using LinearAlgebra, Statistics, Printf, Random, ProgressMeter
+@reexport using FileIO, ImageIO, MeshIO, JSON
+@reexport import CairoMakie
+@reexport using CairoMakie: @L_str, current_figure, Figure, Axis3, scatter, scatter!, linesegments, linesegments!
+@reexport using LinearAlgebra, Statistics, Printf, Random, ProgressMeter, SpecialFunctions
 @reexport using StaticArrays, KernelAbstractions
-@reexport using Lux, Zygote, Optimisers
+@reexport using Lux, Optimisers
+@reexport import Zygote, Enzyme
 @reexport import ColorTypes
 ```
 
