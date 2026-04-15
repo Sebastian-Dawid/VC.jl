@@ -9,18 +9,14 @@ RUN apt update \
 
 WORKDIR /usr/local
 ENV JULIA_CPU_TARGET=generic
+ENV JULIA_DEPOT_PATH=/usr/local/.julia
 
-COPY docker/Project.toml .
-COPY docker/create_sysimage.jl .
+RUN julia -q -O3 -tauto \
+	-e 'using Pkg;\
+	Pkg.add("PackageCompiler");\
+	Pkg.add(url="https://github.com/Sebastian-Dawid/VC.jl.git", rev="v0.2.1");\
+	Pkg.add("TestReports");\
+	using PackageCompiler;\
+	create_sysimage(["VC", "TestReports"];sysimage_path="vc.so", cpu_target="generic", sysimage_build_args=`-O3`)'
 
-RUN julia --project=. -t auto \
-	-O3 \
-	--startup-file=no \
-	create_sysimage.jl
-
-RUN julia --sysimage /usr/local/vc.so \
-	--sysimage-native-code=yes \
-	-O3 -t auto \
-	--startup-file=no \
-	--project=. \
-	-e 'using Pkg;Pkg.instantiate()'
+CMD [ "julia", "--sysimage=/usr/local/vc.so", "--sysimage-native-code=yes" ]
