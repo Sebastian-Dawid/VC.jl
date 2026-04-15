@@ -31,8 +31,7 @@ using Reexport
 @reexport using CairoMakie: @L_str, current_figure, Figure, Axis3, scatter, scatter!, linesegments, linesegments!
 @reexport using LinearAlgebra, Statistics, Printf, Random, ProgressMeter, SpecialFunctions
 @reexport using StaticArrays, KernelAbstractions
-@reexport using Lux, Optimisers
-@reexport import Zygote, Enzyme
+@reexport using Lux, Zygote, Optimisers
 @reexport import ColorTypes
 ```
 
